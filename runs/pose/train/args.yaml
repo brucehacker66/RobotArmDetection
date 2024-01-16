@@ -1,8 +1,8 @@
 task: pose
 mode: train
-model: yolov8n-pose.pt
+model: runs/pose/train/weights/best.pt
 data: config.yaml
-epochs: 10
+epochs: 100
 time: null
 patience: 50
 batch: 16

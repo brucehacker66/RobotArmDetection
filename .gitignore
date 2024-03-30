@@ -160,10 +160,10 @@ cython_debug/
 /.idea
 /labels/
 /images/
-/yolov8n-pose.pt
+/yolov8/yolov8n-pose.pt
 /data/
 /samples/
 /runs/
 /runs/pose/
 /result/
-/yolov8n.pt
+/yolov8/yolov8n.pt

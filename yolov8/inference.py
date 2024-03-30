@@ -5,8 +5,8 @@ import time
 start_time = time.perf_counter()
 model_path = "runs/pose/train/weights/best.pt"
 model = YOLO(model_path)
-folder_path = "samples"
-result_folder_path = "result"
+folder_path = "../samples"
+result_folder_path = "../result"
 results = model.predict(source=folder_path)
 end_time = time.perf_counter()
 elapsed_time = end_time - start_time # calculate the elapsed time

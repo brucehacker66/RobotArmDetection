@@ -11,4 +11,4 @@ if device == "0":
 print("Device:", device, "\n")
 model = YOLO('yolov8n-pose.pt')  # load a pretrained model (recommended for training)
 if __name__ == '__main__':
-    model.train(data='config1.yaml', epochs=50, imgsz=640)
+    model.train(data='config1.yaml', epochs=100, imgsz=640)

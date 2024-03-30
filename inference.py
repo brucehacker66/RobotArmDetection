@@ -22,7 +22,7 @@ for i, r in enumerate(results): # iterate over the results list
 
     draw = ImageDraw.Draw(im)
     draw.line([(keypoints[0][0][0], keypoints[0][0][1]), (keypoints[0][1][0],
-            keypoints[0][1][1]), (keypoints[0][2][0], keypoints[0][2][1])],
+            keypoints[0][1][1]), (keypoints[0][2][0], keypoints[0][2][1]), (keypoints[0][3][0], keypoints[0][3][1])],
              fill=(0, 0,255), width=5)
     im.save(f"{result_folder_path}/result_{num}.png", format="PNG") # save the image with a different name
     num += 1

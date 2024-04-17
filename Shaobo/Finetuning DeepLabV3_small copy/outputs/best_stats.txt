@@ -1,0 +1,4 @@
+best_valid_loss: 0.1704; 
+valid_PixAcc: 89.6481; 
+train_loss: 0.0849; 
+train_PixAcc: 97.8238

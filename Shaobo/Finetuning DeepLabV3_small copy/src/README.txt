@@ -1,0 +1,1 @@
+Command to run inference: python inference_image.py --input ../input/mixed_humans_robot_arms/valid_images/

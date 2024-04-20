@@ -14,6 +14,7 @@ parser.add_argument('-i', '--input', help='path to input dir')
 args = parser.parse_args()
 
 out_dir = os.path.join('..', 'outputs', 'inference_results')
+out_mask_dir = os.path.join('..', 'outputs', 'inference_results_mask')
 os.makedirs(out_dir, exist_ok=True)
 
 # Set computation device.
@@ -44,3 +45,7 @@ for i, image_path in enumerate(all_image_paths):
     cv2.imshow('Segmented image', final_image)
     cv2.waitKey(1)
     cv2.imwrite(os.path.join(out_dir, image_path), final_image)
+
+    cv2.imshow('Segmentation mask', segmented_image)
+    cv2.waitKey(1)
+    cv2.imwrite(os.path.join(out_mask_dir, image_path), segmented_image)

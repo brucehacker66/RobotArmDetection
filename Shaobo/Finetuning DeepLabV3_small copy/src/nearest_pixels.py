@@ -5,6 +5,7 @@ from PIL import Image
 import numpy as np
 from scipy.spatial import KDTree
 import os
+import cv2
 
 import tqdm
 
@@ -122,8 +123,6 @@ def find_all_pairs(img):
     # print('Adjacent pairs:', adjacent_pairs)
     # print('Number of adjacent pairs:', len(adjacent_pairs))
 
-
-
     # Remove adjacent pairs from red and green coordinates
     red_coords, green_coords = remove_pixels_with_adjacent(red_coords, green_coords)
 
@@ -155,25 +154,28 @@ def pairs_dict_to_list(pairs_dict):
         pairs_list.append((pair[1][1], pair[1][0]))
     return pairs_list
 
-# Find all pairs for all images in the output directory, write to a json file
-mask_path = '../outputs/inference_results_mask/'
-output_path = '../outputs/near_pixel_pairs/'
-
-output = {}
-for masks in tqdm.tqdm(os.listdir(mask_path), desc='Processing images'):
-    image_path = mask_path + masks
-    input_image = Image.open(image_path)
-    out_dict = find_all_pairs(input_image)
-    # output[masks] = out_dict
-    out_list = pairs_dict_to_list(out_dict['all_pairs'])
-    output[masks] = out_list
-    with open(output_path + masks[:-4], 'w+') as f:
-        f.write(str(out_list))
-with open(output_path + 'near_pixel_pairs.json', 'w') as f:
-    json.dump(output, f, indent=4)
 
 
+def __main__():
+    # Find all pairs for all images in the output directory, write to a json file
+    mask_path = '../outputs/inference_results_mask/'
+    output_path = '../outputs/near_pixel_pairs/'
 
+    output = {}
+    for masks in tqdm.tqdm(os.listdir(mask_path), desc='Processing images'):
+        image_path = mask_path + masks
+        input_image = Image.open(image_path)
+        out_dict = find_all_pairs(input_image)
+        # output[masks] = out_dict
+        out_list = pairs_dict_to_list(out_dict['all_pairs'])
+        output[masks] = out_list
+        with open(output_path + masks[:-4], 'w+') as f:
+            f.write(str(out_list))
+    with open(output_path + 'near_pixel_pairs.json', 'w') as f:
+        json.dump(output, f, indent=4)
+
+if __name__ == '__main__':
+    __main__()
 
 
 

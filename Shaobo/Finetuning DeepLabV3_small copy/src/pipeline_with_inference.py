@@ -38,7 +38,7 @@ try:
     config = rs.config()
 
     # Tell config that we will use a recorded device from file to be used by the pipeline through playback.
-    rs.config.enable_device_from_file(config, r"D:\Industrial-Robot-Safety\code\robot-safety-detection\f.bag")
+    rs.config.enable_device_from_file(config, r"../config/f.bag")
 
     # Configure the pipeline to stream the depth color stream
     config.enable_stream(rs.stream.depth, 640, 480, rs.format.z16, 30)
@@ -83,6 +83,7 @@ try:
 
         image = Image.fromarray(np.uint8(color_image)).convert('RGB')
 
+
         # # Resize very large images (if width > 1024.) to avoid OOM on GPUs.
         # if image.size[0] > 1024:
         #     image = image.resize((800, 800))
@@ -92,13 +93,16 @@ try:
         # Get the data from the `out` key.
         outputs = outputs['out']
         segmented_image = draw_segmentation_map(outputs)
+        segmented_image = cv2.cvtColor(segmented_image, cv2.COLOR_BGR2RGB)
+
+        # print(segmented_image.size)
+        # cv2.imshow('Segmented image', segmented_image)
+        # cv2.waitKey(5)
 
         # Find all pairs for all images in the output directory, write to a json file
-        out_dict = find_all_pairs(image)
+        out_dict = find_all_pairs(segmented_image)
         # output[masks] = out_dict
         out_list = pairs_dict_to_list(out_dict['all_pairs'])
-
-
 
 
 
@@ -108,6 +112,7 @@ try:
         # pass RGB image to model
         # points = [((100, 300), (103, 300))]
         points = out_list
+        print(points)
         for point in points:
             robot_point = point[0]
             human_point = point[1]

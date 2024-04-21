@@ -148,18 +148,27 @@ def find_all_pairs(image_path):
 
     return out_dict
 
+# Convert pairs dictionary to a list of x,y coordinates
+def pairs_dict_to_list(pairs_dict):
+    pairs_list = []
+    for pair in pairs_dict:
+        pairs_list.append((pair[1][1], pair[1][0]))
+    return pairs_list
 
 # Find all pairs for all images in the output directory, write to a json file
 mask_path = '../outputs/inference_results_mask/'
-output_path = '../outputs/'
+output_path = '../outputs/near_pixel_pairs/'
 output = {}
 for masks in tqdm.tqdm(os.listdir(mask_path), desc='Processing images'):
     image_path = mask_path + masks
     out_dict = find_all_pairs(image_path)
-    output[masks] = out_dict
+    # output[masks] = out_dict
+    out_list = pairs_dict_to_list(out_dict['all_pairs'])
+    output[masks] = out_list
+    with open(output_path + masks[:-4], 'w+') as f:
+        f.write(str(out_list))
 with open(output_path + 'near_pixel_pairs.json', 'w') as f:
     json.dump(output, f, indent=4)
-
 
 
 

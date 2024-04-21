@@ -1,6 +1,4 @@
 import pyrealsense2 as rs
-import numpy as np
-import cv2
 
 import torch
 import argparse
@@ -12,10 +10,8 @@ from config import ALL_CLASSES
 from model import prepare_model
 
 import json
-from PIL import Image
 import numpy as np
 from scipy.spatial import KDTree
-import os
 import tqdm
 from nearest_pixels import find_all_pairs, pairs_dict_to_list
 

@@ -8,10 +8,10 @@ import os
 
 import tqdm
 
-def find_nearest_pairs(image_path, num_pairs=10, red_coords=None, green_coords=None):
-    # Load the image
-    img = Image.open(image_path)
-    pixels = np.array(img)
+def find_nearest_pairs(img, num_pairs=10, red_coords=None, green_coords=None):
+    # # Load the image
+    # img = Image.open(image_path)
+    # pixels = np.array(img)
 
     # # Prepare lists to store coordinates
     # red_coords = []
@@ -39,10 +39,10 @@ def find_nearest_pairs(image_path, num_pairs=10, red_coords=None, green_coords=N
     return nearest_pairs
 
 
-def find_nearest_pairs_kdtree(image_path, num_pairs=20, red_coords=None, green_coords=None):
-    # Load the image
-    img = Image.open(image_path)
-    pixels = np.array(img)
+def find_nearest_pairs_kdtree(img, num_pairs=20, red_coords=None, green_coords=None):
+    # # Load the image
+    # img = Image.open(image_path)
+    # pixels = np.array(img)
 
     # Create KD-Trees
     tree_green = KDTree(green_coords)
@@ -75,9 +75,9 @@ def remove_pixels_with_adjacent(red_coords, green_coords):
     return cleaned_red_coords, cleaned_green_coords
 
 # Find adjacent red and green pixels, maximum of one neighbor per pixel, no repeats
-def find_adjacent_pairs(image_path):
+def find_adjacent_pairs(img):
     # Load the image
-    img = Image.open(image_path)
+    # img = Image.open(image_path)
     pixels = np.array(img)
 
     # Prepare lists to store coordinates
@@ -105,7 +105,7 @@ def find_adjacent_pairs(image_path):
     return adjacent_pairs, red_coords, green_coords
 
 # Find 20 nearest red and green pixels
-def find_all_pairs(image_path):
+def find_all_pairs(img):
     ## Dict to store output info
     #  Fields:
     #  'all_pairs': list of tuples (distance, (red_pixel_coordinates, green_pixel_coordinates)
@@ -115,7 +115,7 @@ def find_all_pairs(image_path):
     out_dict = {}
 
     # Find adjacent pairs
-    adjacent_pairs, red_coords, green_coords = find_adjacent_pairs(image_path)
+    adjacent_pairs, red_coords, green_coords = find_adjacent_pairs(img)
     adjacent_pairs = [(1.0, (pair[0], pair[1])) for pair in adjacent_pairs]
     out_dict['adjacent_pairs'] = adjacent_pairs
     out_dict['num_adjacent_pairs'] = len(adjacent_pairs)
@@ -135,7 +135,7 @@ def find_all_pairs(image_path):
 
     # Find nearest pairs using KD-Tree
     if len(adjacent_pairs) < 20:
-        nearest_pairs = find_nearest_pairs_kdtree(image_path, 20 - out_dict['num_adjacent_pairs'], red_coords, green_coords)
+        nearest_pairs = find_nearest_pairs_kdtree(img, 20 - out_dict['num_adjacent_pairs'], red_coords, green_coords)
         out_dict['nearest_pairs'] = nearest_pairs
         # print('Nearest pairs:', nearest_pairs)
         # print(len(nearest_pairs))
@@ -158,10 +158,12 @@ def pairs_dict_to_list(pairs_dict):
 # Find all pairs for all images in the output directory, write to a json file
 mask_path = '../outputs/inference_results_mask/'
 output_path = '../outputs/near_pixel_pairs/'
+
 output = {}
 for masks in tqdm.tqdm(os.listdir(mask_path), desc='Processing images'):
     image_path = mask_path + masks
-    out_dict = find_all_pairs(image_path)
+    input_image = Image.open(image_path)
+    out_dict = find_all_pairs(input_image)
     # output[masks] = out_dict
     out_list = pairs_dict_to_list(out_dict['all_pairs'])
     output[masks] = out_list

@@ -169,3 +169,4 @@ cython_debug/
 /yolov8/yolov8n.pt
 /pipelinedata
 /yolov8/runs
+/yolov8/yolov8m-pose.pt

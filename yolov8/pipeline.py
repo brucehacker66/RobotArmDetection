@@ -9,7 +9,7 @@ from PIL import Image
 robot_color = (255, 0, 0)  # Blue color for robot-arm
 human_color = (0, 255, 0)  # Green color for person
 line_color = (255, 255, 0)  # Yellow for connecting lines
-depth_threshold = 10  # Threshold in cm
+depth_threshold = 25  # Threshold in cm
 dist_threshold = 70
 
 # Load the pre-trained YOLOv8 model

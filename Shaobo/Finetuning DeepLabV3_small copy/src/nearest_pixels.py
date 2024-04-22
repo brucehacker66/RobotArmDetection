@@ -106,7 +106,7 @@ def find_adjacent_pairs(img):
     return adjacent_pairs, red_coords, green_coords
 
 # Find 20 nearest red and green pixels
-def find_all_pairs(img):
+def find_all_pairs(img, dist_threshold=1.0):
     ## Dict to store output info
     #  Fields:
     #  'all_pairs': list of tuples (distance, (red_pixel_coordinates, green_pixel_coordinates)
@@ -133,7 +133,7 @@ def find_all_pairs(img):
     #     print('Nearest pairs:', nearest_pairs)
 
     # Find nearest pairs using KD-Tree
-    if len(adjacent_pairs) < 20:
+    if len(adjacent_pairs) < 20 and len(red_coords) > 0 and len(green_coords) > 0:
         nearest_pairs = find_nearest_pairs_kdtree(img, 20 - out_dict['num_adjacent_pairs'], red_coords, green_coords)
         out_dict['nearest_pairs'] = nearest_pairs
         # print('Nearest pairs:', nearest_pairs)
@@ -144,6 +144,9 @@ def find_all_pairs(img):
     # Store adjacent and nearest pairs in the output dictionary
     out_dict['all_pairs'] = adjacent_pairs + nearest_pairs
     # print('Total pairs:', out_dict['all_pairs'])
+
+    # Remove pairs with distance greater than the threshold
+    # out_dict['all_pairs'] = [pair for pair in out_dict['all_pairs'] if pair[0] <= dist_threshold]
 
     return out_dict
 

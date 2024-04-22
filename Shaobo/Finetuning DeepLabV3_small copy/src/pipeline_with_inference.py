@@ -1,3 +1,5 @@
+import time
+from matplotlib import pyplot as plt
 import pyrealsense2 as rs
 
 import torch
@@ -17,7 +19,8 @@ from nearest_pixels import find_all_pairs, pairs_dict_to_list
 
 robot_color = (255, 0, 0)  # Blue color for the robot point
 human_color = (0, 255, 0)  # Green color for the human point
-deptth_threshold = 10 #threshold in cm
+depth_threshold = 10 #threshold in cm
+dist_threshold = 20 #2-d image distance threshold in pixels
 
 # New code for inference and nearest pixels: 
 # Set computation device and load pre-trained model
@@ -83,27 +86,51 @@ try:
 
             # Do forward pass and get the output dictionary.
             outputs = get_segment_labels(image, model, device)
-            # Get the data from the `out` key.
             outputs = outputs['out']
             segmented_image = draw_segmentation_map(outputs)
+
+
+            # Create a mask for the segmented image
+            red_mask = cv2.inRange(segmented_image, (0, 0, 200), (0, 0, 255))
+            green_mask = cv2.inRange(segmented_image, (0, 200, 0), (0, 255, 0))
+
+            # Remove noise by opening regions with less than opening_threshold pixels
+            opening_threshold = 200
+
+            num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(red_mask, connectivity=8)
+            for i in range(1, num_labels):
+                size = stats[i, cv2.CC_STAT_AREA]
+                if size < opening_threshold:
+                    segmented_image[labels == i] = [0, 0, 0]
+            
+            num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(green_mask, connectivity=8)
+            for i in range(1, num_labels):
+                size = stats[i, cv2.CC_STAT_AREA]
+                if size < opening_threshold:
+                    segmented_image[labels == i] = [0, 0, 0]    
+
             segmented_image = cv2.cvtColor(segmented_image, cv2.COLOR_BGR2RGB)
 
             # print(segmented_image.size)
             # cv2.imshow('Segmented image', segmented_image)
             # cv2.waitKey(5)
+            # time.sleep(2)
 
             # Find all pairs for all images in the output directory, write to a json file
-            out_dict = find_all_pairs(segmented_image)
+            out_dict = find_all_pairs(segmented_image, dist_threshold)
             # output[masks] = out_dict
             out_list = pairs_dict_to_list(out_dict['all_pairs'])
 
             # iterate to find the closest points
             points = out_list
-            closest_pair = points[0] #closest pair of pixels
+            if len(points) == 0:
+                closest_pair = ()
+            else:
+                closest_pair = points[0] #closest pair of pixels
             distance = 500
             if points is None:
                 continue
-            print(points)
+            # print(points)
             for point in points:
                 robot_point = point[0]
                 human_point = point[1]
@@ -115,6 +142,7 @@ try:
                     closest_pair = point
                     distance = depth_diff
                 if depth_diff < depth_threshold:
+                    print(f"For frame {count}:")
                     print("too close")
                     print("robot:", robot_point, depth_robot)
                     print("human:", human_point, depth_human)
@@ -145,8 +173,9 @@ try:
             cv2.imshow(f"Color Stream{count}", color_image)
 
             # Save one frame of depth image and the corresponding RGB image
-            cv2.imwrite(f'saved_depth_image{count}.png', depth_color_image)
-            cv2.imwrite(f'saved_color_image{count}.png', color_image)
+            cv2.imwrite(f'./saved_images/saved_depth_image{count}.png', depth_color_image)
+            cv2.imwrite(f'./saved_images/saved_color_image{count}.png', color_image)
+            cv2.imwrite(f'./saved_images/saved_segmented_image{count}.png', segmented_image)
 
             key = cv2.waitKey(1)
             # if pressed escape exit program
